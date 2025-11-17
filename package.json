@@ -63,12 +63,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ledding.git"
+    "url": "https://github.com/eddndev/ledding.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ledding/issues"
+    "url": "https://github.com/eddndev/ledding/issues"
   },
-  "homepage": "https://github.com/yourusername/ledding#readme",
+  "homepage": "https://github.com/eddndev/ledding#readme",
   "engines": {
     "node": ">=16.0.0"
   }
