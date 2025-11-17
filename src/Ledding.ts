@@ -8,12 +8,16 @@ import type {
   LedState,
   LeddingEventType,
   LeddingEventCallback,
+  PatternTransitionOptions,
+  PatternTransitionStrategy,
+  EasingName,
 } from './types';
 import { defaultOptions } from './defaults';
 import { debounce } from './utils/debounce';
 import { parseRgbToIntArray } from './utils/color';
 import { Directions } from './constants';
 import { createGrid, updateSparseGrid, updateClassicGrid } from './core/GridManager';
+import { getEasingFunction } from './utils/easing';
 
 /**
  * Deep merge utility for options
@@ -94,6 +98,22 @@ export class Ledding {
 
   // Circle path for optimized rendering
   unitCirclePath?: Path2D;
+
+  // Pattern transition state
+  private _patternTransition: {
+    isActive: boolean;
+    strategy: PatternTransitionStrategy;
+    startTime: number;
+    duration: number;
+    easing: EasingName;
+    oldPattern: number[][];
+    newPattern: number[][];
+    phase: 'fadeOut' | 'fadeIn' | 'morphing';
+  } | null = null;
+
+  // Grid size tracking for maximum dimensions
+  private _maxPatternCols: number = 0;
+  private _maxPatternRows: number = 0;
 
   constructor(targetSelector: string, userOptions: LeddingUserOptions = {}) {
     const container = document.querySelector<HTMLElement>(targetSelector);
@@ -405,11 +425,21 @@ export class Ledding {
 
   /**
    * Get interpolated color for a LED
+   * Color interpolation is based on transition progress, NOT size
    */
   private _getInterpolatedColor(led: LedState): string {
     const baseColor = this.parsedColors.base!;
     const activeColor = this.parsedColors.states[led.artValueForColor] || baseColor;
 
+    // If LED is fully transitioned (not transitioning), use full color
+    if (!led.isTransitioning && !led.isDelayed) {
+      if (led.artValueForColor === 0) {
+        return this.options.colors.base;
+      }
+      return this.options.colors.states[led.artValueForColor] || this.options.colors.base;
+    }
+
+    // If colors are identical, return immediately
     if (baseColor === activeColor) {
       if (led.artValueForColor === 0) {
         return this.options.colors.base;
@@ -417,11 +447,18 @@ export class Ledding {
       return this.options.colors.states[led.artValueForColor] || this.options.colors.base;
     }
 
-    const { minSize, maxSize } = this.dimensions;
+    // Calculate interpolation factor based on OPACITY transition, not size
+    // This ensures color matches the visual "activation" state
+    const { min: minOpacity, max: maxOpacity } = this.options.opacities.base;
+    const activeOpacity = this.options.opacities.active;
+    const opacityRange = activeOpacity - minOpacity;
 
-    if (maxSize === minSize) return this.options.colors.base;
-
-    let factor = (led.currentSize - minSize) / (maxSize - minSize);
+    let factor: number;
+    if (opacityRange === 0) {
+      factor = 1;
+    } else {
+      factor = (led.currentOpacity - minOpacity) / opacityRange;
+    }
 
     if (factor < 0) factor = 0;
     else if (factor > 1) factor = 1;

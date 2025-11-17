@@ -89,9 +89,14 @@ export function prepareTransition(
 
   const { maxSize, minSize, scaledLedSize } = dimensions;
   if (targetArtValue > 0) {
-    if (targetArtValue === 1) led.targetSize = maxSize;
-    else if (targetArtValue === 2) led.targetSize = scaledLedSize * 0.7;
-    else led.targetSize = scaledLedSize * 0.4;
+    // Check if custom size is defined for this state
+    const customSizeMultiplier = options.sizes.states?.[targetArtValue];
+    if (customSizeMultiplier !== undefined) {
+      led.targetSize = scaledLedSize * customSizeMultiplier;
+    } else {
+      // Default: all active states use maxSize (full size)
+      led.targetSize = maxSize;
+    }
   } else {
     led.targetSize = minSize;
   }
@@ -151,23 +156,47 @@ export function updateSingleLedState(
   }
 
   if (led.isTransitioning) {
-    const speed = led.transitionSpeed;
+    if (led.useDurationBased) {
+      // Duration-based easing transition
+      const now = performance.now();
+      const elapsed = now - led.transitionStartTime;
+      const t = Math.min(elapsed / led.transitionDuration, 1);
+      const easingFn = getEasingFunction(led.transitionEasing);
+      const easedT = easingFn(t);
 
-    led.currentSize += (led.targetSize - led.currentSize) * speed;
-    led.currentOpacity += (led.targetOpacity - led.currentOpacity) * speed;
+      led.currentSize = led.startSize + (led.targetSize - led.startSize) * easedT;
+      led.currentOpacity = led.startOpacity + (led.targetOpacity - led.startOpacity) * easedT;
 
-    const threshold = 0.01;
-    const sizeFinished = Math.abs(led.currentSize - led.targetSize) < threshold;
-    const opacityFinished = Math.abs(led.currentOpacity - led.targetOpacity) < threshold;
+      if (t >= 1) {
+        led.currentSize = led.targetSize;
+        led.currentOpacity = led.targetOpacity;
+        led.currentArtValue = led.targetArtValue;
+        led.isTransitioning = false;
 
-    if (sizeFinished && opacityFinished) {
-      led.currentSize = led.targetSize;
-      led.currentOpacity = led.targetOpacity;
-      led.currentArtValue = led.targetArtValue;
-      led.isTransitioning = false;
+        if (led.currentArtValue === 0) {
+          led.artValueForColor = 0;
+        }
+      }
+    } else {
+      // Legacy lerp-based transition
+      const speed = led.transitionSpeed;
 
-      if (led.currentArtValue === 0) {
-        led.artValueForColor = 0;
+      led.currentSize += (led.targetSize - led.currentSize) * speed;
+      led.currentOpacity += (led.targetOpacity - led.currentOpacity) * speed;
+
+      const threshold = 0.01;
+      const sizeFinished = Math.abs(led.currentSize - led.targetSize) < threshold;
+      const opacityFinished = Math.abs(led.currentOpacity - led.targetOpacity) < threshold;
+
+      if (sizeFinished && opacityFinished) {
+        led.currentSize = led.targetSize;
+        led.currentOpacity = led.targetOpacity;
+        led.currentArtValue = led.targetArtValue;
+        led.isTransitioning = false;
+
+        if (led.currentArtValue === 0) {
+          led.artValueForColor = 0;
+        }
       }
     }
   }

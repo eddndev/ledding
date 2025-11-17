@@ -5,6 +5,7 @@ export { Ledding } from './Ledding';
 export type {
   Direction,
   AnimationPattern,
+  EasingName,
   RGBArray,
   LedState,
   Renderer,
@@ -15,6 +16,8 @@ export type {
   TransitionAnimationOptions,
   AnimationOptions,
   TransitionSpeedOptions,
+  TransitionDurationOptions,
+  TransitionConfig,
   TransitionsOptions,
   GridOptions,
   LeddingOptions,
@@ -27,6 +30,9 @@ export type {
   LeddingEventCallback,
   LeddingInstance,
 } from './types';
+
+// Type guards
+export { isDurationBased } from './types';
 
 // Constants
 export { Pattern, Directions } from './constants';
@@ -49,6 +55,42 @@ export {
 
 // Utilities (tree-shakeable)
 export { lerp, clamp, randomBetween, debounce, parseRgbToIntArray, AnimationEngine } from './utils';
+
+// Easing functions (tree-shakeable)
+export {
+  easingFunctions,
+  getEasingFunction,
+  isEasingName,
+  linear,
+  easeInQuad,
+  easeOutQuad,
+  easeInOutQuad,
+  easeInCubic,
+  easeOutCubic,
+  easeInOutCubic,
+  easeInQuart,
+  easeOutQuart,
+  easeInOutQuart,
+  easeInQuint,
+  easeOutQuint,
+  easeInOutQuint,
+  easeInExpo,
+  easeOutExpo,
+  easeInOutExpo,
+  easeInCirc,
+  easeOutCirc,
+  easeInOutCirc,
+  easeInBack,
+  easeOutBack,
+  easeInOutBack,
+  easeInElastic,
+  easeOutElastic,
+  easeInOutElastic,
+  easeInBounce,
+  easeOutBounce,
+  easeInOutBounce,
+} from './utils';
+export type { EasingFunction } from './utils';
 
 // Default configuration
 export { defaultOptions, defaultArtPattern } from './defaults';

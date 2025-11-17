@@ -116,6 +116,15 @@ export interface ColorOptions {
 }
 
 /**
+ * Size configuration for LED states
+ * Values are multipliers of scaledLedSize (0.0 to 1.0)
+ * If not specified, all active states use maxSize (1.0)
+ */
+export interface SizeOptions {
+  states?: Record<number, number>;
+}
+
+/**
  * Opacity configuration
  */
 export interface OpacityOptions {
@@ -181,6 +190,20 @@ export function isDurationBased(config: TransitionConfig): config is TransitionD
 }
 
 /**
+ * Pattern transition strategies
+ */
+export type PatternTransitionStrategy = 'instant' | 'morph' | 'fade' | 'crossfade';
+
+/**
+ * Options for pattern transitions
+ */
+export interface PatternTransitionOptions {
+  duration?: number;
+  easing?: EasingName;
+  strategy?: PatternTransitionStrategy;
+}
+
+/**
  * All transition speed configurations
  */
 export interface TransitionsOptions {
@@ -208,6 +231,7 @@ export interface LeddingOptions {
   aligner: Aligner;
   renderer: Renderer;
   colors: ColorOptions;
+  sizes: SizeOptions;
   opacities: OpacityOptions;
   fps: number;
   animation: AnimationOptions;

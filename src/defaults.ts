@@ -33,6 +33,10 @@ export const defaultOptions: LeddingOptions = {
     },
   },
 
+  sizes: {
+    states: {}, // Empty means all states use maxSize (1.0)
+  },
+
   opacities: {
     base: { min: 0.5, max: 0.75 },
     active: 1,
