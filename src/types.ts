@@ -315,3 +315,41 @@ export interface LeddingInstance {
   scrollX: number;
   scrollY: number;
 }
+
+/**
+ * Playlist item configuration
+ */
+export interface PlaylistItem {
+  pattern: number[][];
+  hold: number;                              // ms to hold this pattern
+  transition?: PatternTransitionOptions;     // transition TO this pattern
+  onEnter?: () => void;
+  onExit?: () => void;
+}
+
+/**
+ * Playlist configuration options
+ */
+export interface PlaylistOptions {
+  loop?: boolean | number;                   // true = infinite, number = N times
+  autoStart?: boolean;
+  shuffle?: boolean;
+  reverse?: boolean;
+  speed?: number;
+  startIndex?: number;
+  onComplete?: () => void;
+  onPatternChange?: (index: number, pattern: number[][]) => void;
+}
+
+/**
+ * Current playlist state
+ */
+export interface PlaylistState {
+  isPlaying: boolean;
+  isPaused: boolean;
+  currentIndex: number;
+  totalPatterns: number;
+  timeRemaining: number;                     // ms until next pattern
+  loopsCompleted: number;
+  loopsTotal: number | 'infinite';
+}

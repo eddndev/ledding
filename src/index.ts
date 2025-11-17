@@ -29,6 +29,11 @@ export type {
   LeddingEventType,
   LeddingEventCallback,
   LeddingInstance,
+  PatternTransitionStrategy,
+  PatternTransitionOptions,
+  PlaylistItem,
+  PlaylistOptions,
+  PlaylistState,
 } from './types';
 
 // Type guards
