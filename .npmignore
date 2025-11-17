@@ -1,0 +1,41 @@
+# Source files (only dist is published)
+src/
+tests/
+examples/
+
+# Config files
+tsconfig.json
+rollup.config.js
+.eslintrc*
+.prettierrc*
+jest.config.js
+
+# Development
+.git/
+.github/
+.vscode/
+.idea/
+node_modules/
+
+# Old JavaScript source (before TypeScript migration)
+aligners/
+methods/
+patterns/
+renderers/
+utils/
+config.js
+ledding.js
+.claude/
+
+# Build artifacts
+*.tsbuildinfo
+coverage/
+.nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
